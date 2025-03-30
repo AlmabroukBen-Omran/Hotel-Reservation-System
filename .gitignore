@@ -27,3 +27,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Prevent .gitignore file from being committed to Github repository ###
+.env
