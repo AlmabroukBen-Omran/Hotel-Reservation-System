@@ -58,8 +58,8 @@ public class UserLogin {
             if (rs.next()) {
                 String storedPassword = rs.getString("password");
                 String role = rs.getString("role");
-                String firstName = rs.getString("firstName");
-                String lastName = rs.getString("lastName");
+                String firstname = rs.getString("firstname");
+                String lastname = rs.getString("lastname");
                 String phoneNumber = rs.getString("phoneNumber");
                 String email = rs.getString("email");
 
@@ -74,9 +74,20 @@ public class UserLogin {
                 String computedHashHexString = Hashing.hashSaltedPassword(saltHexString, password);
 
                 if (computedHashHexString.equals(storedHashHexString)) {
-                    User user = new User(username, storedPassword, role, firstName, lastName, phoneNumber, email);
+                    User user = new User(username, storedPassword, role, firstname, lastname, phoneNumber, email);
                     System.out.println("Login successful! Welcome " + user.getFirstName() + " (" + user.getRole() + ")");
                     // TODO: Implement role-based redirection for Admin, Manager, and Receptionist
+                    if (user.getRole().equals("Admin")) {
+                        System.out.println("Move to Admin dashboard");
+                        UserRegistration userRegistration = new UserRegistration(stage);
+                        userRegistration.showRegistrationScene();
+                    }
+                    if (user.getRole().equals("Receptionist")) {
+                        System.out.println("Move to Receptionist dashboard");
+                    }
+                    if (user.getRole().equals("Manager")) {
+                        System.out.println("Move to Manager dashboard");
+                    }
                 } else {
                     showAlert("Authentication Failed", "Invalid username or password.");
                 }
