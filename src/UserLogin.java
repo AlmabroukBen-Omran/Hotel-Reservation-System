@@ -47,6 +47,11 @@ public class UserLogin {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
+        if (RateLimit.isAccountLocked(username)) {
+            showAlert("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact an Admin.");
+            return;
+        }
+
         Connection con = DBUtils.establishConnection();
         String query = "SELECT * FROM users WHERE username = ?;";
 
@@ -63,6 +68,11 @@ public class UserLogin {
                 String phoneNumber = rs.getString("phoneNumber");
                 String email = rs.getString("email");
 
+                if (RateLimit.isAccountLocked(username)) {
+                    showAlert("Account Locked", "Your account is locked. Please contact an Admin.");
+                    return;
+                }
+
                 String[] parts = storedPassword.split(":");
                 if (parts.length != 2) {
                     showAlert("Authentication Failed", "Invalid username or password");
@@ -74,13 +84,16 @@ public class UserLogin {
                 String computedHashHexString = Hashing.hashSaltedPassword(saltHexString, password);
 
                 if (computedHashHexString.equals(storedHashHexString)) {
+                    RateLimit.resetFailedAttempts(username); // Reset failed attempts on success
+
                     User user = new User(username, storedPassword, role, firstname, lastname, phoneNumber, email);
                     System.out.println("Login successful! Welcome " + user.getFirstName() + " (" + user.getRole() + ")");
+
                     // TODO: Implement role-based redirection for Admin, Manager, and Receptionist
                     if (user.getRole().equals("Admin")) {
                         System.out.println("Move to Admin dashboard");
-                        UserRegistration userRegistration = new UserRegistration(stage);
-                        userRegistration.showRegistrationScene();
+                        AdminDashboard adminDashboard = new AdminDashboard(stage);
+                        adminDashboard.showAdminDashboardScene();
                     }
                     if (user.getRole().equals("Receptionist")) {
                         System.out.println("Move to Receptionist dashboard");
@@ -90,6 +103,7 @@ public class UserLogin {
                     }
                 } else {
                     showAlert("Authentication Failed", "Invalid username or password.");
+                    RateLimit.increaseFailedAttempts(username);
                 }
             } else {
                 showAlert("Authentication Failed", "Invalid username or password.");
