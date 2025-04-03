@@ -89,15 +89,16 @@ public class UserLogin {
                     User user = new User(username, storedPassword, role, firstname, lastname, phoneNumber, email);
                     System.out.println("Login successful! Welcome " + user.getFirstName() + " (" + user.getRole() + ")");
 
-                    // TODO: Implement role-based redirection for Admin, Manager, and Receptionist
                     if (user.getRole().equals("Admin")) {
-                        System.out.println("Move to Admin dashboard");
                         AdminDashboard adminDashboard = new AdminDashboard(stage);
                         adminDashboard.showAdminDashboardScene();
                     }
                     if (user.getRole().equals("Receptionist")) {
-                        System.out.println("Move to Receptionist dashboard");
+                        ReceptionistDashboard receptionistDashboard = new ReceptionistDashboard(stage);
+                        receptionistDashboard.showReceptionistDashboardScene();
                     }
+
+                    // TODO: Implement role-based redirection for Manager
                     if (user.getRole().equals("Manager")) {
                         System.out.println("Move to Manager dashboard");
                     }
