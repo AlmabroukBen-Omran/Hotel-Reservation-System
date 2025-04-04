@@ -7,19 +7,19 @@ public class Customer {
     private SimpleStringProperty firstName;
     private SimpleStringProperty lastName;
     private SimpleStringProperty phoneNumber;
-    private SimpleLongProperty qid;
+    private SimpleStringProperty qid;
 
-    public Customer(int customerID, String firstName, String lastName, String phoneNumber, long qid) {
+    public Customer(int customerID, String firstName, String lastName, String phoneNumber, String qid) {
         this.customerID = new SimpleIntegerProperty(customerID);
         this.firstName = new SimpleStringProperty(firstName);
         this.lastName = new SimpleStringProperty(lastName);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
-        this.qid = new SimpleLongProperty(qid);
+        this.qid = new SimpleStringProperty(qid);
     }
 
     public SimpleIntegerProperty getCustomerID() { return customerID; }
     public SimpleStringProperty getFirstName() { return firstName; }
     public SimpleStringProperty getLastName() { return lastName; }
     public SimpleStringProperty getPhoneNumber() { return phoneNumber; }
-    public SimpleLongProperty getQid() { return qid; }
+    public SimpleStringProperty getQid() { return qid; }
 }

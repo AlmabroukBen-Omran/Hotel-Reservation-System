@@ -52,38 +52,48 @@ public class CustomerRegistration {
     }
 
     private void registerCustomer() {
-        String firstName = firstNameField.getText();
-        String lastName = lastNameField.getText();
+        String firstname = firstNameField.getText();
+        String lastname = lastNameField.getText();
         String phoneNumber = phoneNumberField.getText();
-        long qid;
+        String qid = qidField.getText();
 
-        // Check if QID field is empty by catching this exception since we cannot use || condition on long values
-        try {
-            qid = Long.parseLong(qidField.getText());
-        } catch (NumberFormatException e) {
-            showAlert("Input Error", "QID must be a valid numeric value.");
-            return;
-        }
 
-        if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty()) {
+        if (firstname.isEmpty() || lastname.isEmpty() || phoneNumber.isEmpty() || qid.isEmpty()) {
             showAlert("Registration Failed", "Please fill in all fields.");
             return;
         }
 
-        // TODO: Implement regex validation for all customer registration fields
+        if (!ValidateCustomerRegistration.isValidFirstName(firstname)) {
+            showAlert("Invalid First Name", "First name must contain only letters and be 2 to 50 characters long.");
+            return;
+        }
 
+        if (!ValidateCustomerRegistration.isValidLastName(lastname)) {
+            showAlert("Invalid Last Name", "Last name must contain only letters and be 2 to 50 characters long.");
+            return;
+        }
+
+        if (!ValidateCustomerRegistration.isValidPhoneNumber(phoneNumber)) {
+            showAlert("Invalid Phone Number", "Phone number must conform to the Qatari format (e.g., +974 XXXXXXXX)");
+            return;
+        }
+
+        if (!ValidateCustomerRegistration.isValidQid(qid)) {
+            showAlert("Invalid QID", "QID must only consist of 11 digits.");
+            return;
+        }
 
         String insertQuery = "INSERT INTO customers (firstname, lastname, phoneNumber, QID) VALUES (?, ?, ?, ?)";
 
         try (Connection con = DBUtils.establishConnection();
-             PreparedStatement stmt = con.prepareStatement(insertQuery)) {
+             PreparedStatement statement = con.prepareStatement(insertQuery)) {
 
-            stmt.setString(1, firstName);
-            stmt.setString(2, lastName);
-            stmt.setString(3, phoneNumber);
-            stmt.setLong(4, qid);
+            statement.setString(1, firstname);
+            statement.setString(2, lastname);
+            statement.setString(3, phoneNumber);
+            statement.setString(4, Encryption.encrypt(qid));
 
-            int rowsAffected = stmt.executeUpdate();
+            int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {
                 showAlert("Success", "Customer registered successfully!");
                 stage.close(); // Close registration window after success
