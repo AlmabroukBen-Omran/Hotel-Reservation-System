@@ -39,16 +39,27 @@ public class ReceptionistDashboard {
         Button createCustomerButton = new Button("Create Customer Profile");
         createCustomerButton.setOnAction(event -> openCustomerRegistration());
 
+        Button showCustomersButton = new Button("Show Customers");
+        showCustomersButton.setOnAction(event -> showCustomers());
+
+        Button createReservationButton = new Button("Create Reservation");
+        createReservationButton.setOnAction(event -> openCreateReservation());
+
         roomTableView = new TableView<>();
         setupTableView();
 
-        layout.getChildren().addAll(dashboardTitle, checkRoomsButton, createCustomerButton, roomTableView);
+        layout.getChildren().addAll(dashboardTitle, checkRoomsButton, createCustomerButton, showCustomersButton, createReservationButton, roomTableView);
     }
 
     // Opens the Customer Registration Form
     private void openCustomerRegistration() {
         Stage customerStage = new Stage();
         new CustomerRegistration(customerStage);
+    }
+
+    private void openCreateReservation() {
+        Stage reservationStage = new Stage();
+        new CreateReservation(reservationStage);
     }
 
     private void setupTableView() {
@@ -90,6 +101,63 @@ public class ReceptionistDashboard {
             showAlert("Database Error", "Failed to retrieve room data.");
         }
     }
+
+    private void showCustomers() {
+        Stage customerStage = new Stage();
+        customerStage.setTitle("Customer List");
+
+        TableView<Customer> customerTable = new TableView<>();
+
+        TableColumn<Customer, Number> idCol = new TableColumn<>("Customer ID");
+        idCol.setCellValueFactory(data -> data.getValue().getCustomerID());
+
+        TableColumn<Customer, String> firstNameCol = new TableColumn<>("First Name");
+        firstNameCol.setCellValueFactory(data -> data.getValue().getFirstName());
+
+        TableColumn<Customer, String> lastNameCol = new TableColumn<>("Last Name");
+        lastNameCol.setCellValueFactory(data -> data.getValue().getLastName());
+
+        TableColumn<Customer, String> phoneCol = new TableColumn<>("Phone Number");
+        phoneCol.setCellValueFactory(data -> data.getValue().getPhoneNumber());
+
+        TableColumn<Customer, String> qidCol = new TableColumn<>("QID");
+        qidCol.setCellValueFactory(data -> data.getValue().getQid());
+
+        customerTable.getColumns().addAll(idCol, firstNameCol, lastNameCol, phoneCol, qidCol);
+
+        ObservableList<Customer> customerList = FXCollections.observableArrayList();
+        String query = "SELECT customerID, firstname, lastname, phoneNumber, QID FROM customers";
+
+        try (Connection con = DBUtils.establishConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int customerID = rs.getInt("customerID");
+                String firstname = rs.getString("firstname");
+                String lastname = rs.getString("lastname");
+                String phoneNumber = rs.getString("phoneNumber");
+                String qid = Encryption.decrypt(rs.getString("QID"));
+
+                customerList.add(new Customer(customerID, firstname, lastname, phoneNumber, qid));
+            }
+
+            customerTable.setItems(customerList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Database Error", "Failed to retrieve customer data.");
+        }
+
+        VBox customerLayout = new VBox(10);
+        customerLayout.setPadding(new Insets(10));
+        customerLayout.getChildren().addAll(new Label("Customers"), customerTable);
+
+        Scene scene = new Scene(customerLayout, 600, 400);
+        customerStage.setScene(scene);
+        customerStage.show();
+    }
+
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
