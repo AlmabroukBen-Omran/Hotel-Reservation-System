@@ -48,6 +48,7 @@ public class UserLogin {
         String password = passwordField.getText();
 
         if (RateLimit.isAccountLocked(username)) {
+            Logging.log(username, "Login Attempt - Failed (Account Locked)");
             showAlert("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact an Admin.");
             return;
         }
@@ -69,12 +70,14 @@ public class UserLogin {
                 String email = rs.getString("email");
 
                 if (RateLimit.isAccountLocked(username)) {
+                    Logging.log(username, "Login Attempt - Failed (Account Locked)");
                     showAlert("Account Locked", "Your account is locked. Please contact an Admin.");
                     return;
                 }
 
                 String[] parts = storedPassword.split(":");
                 if (parts.length != 2) {
+                    Logging.log(username, "Login Attempt - Failed (Corrupt Stored Hash)");
                     showAlert("Authentication Failed", "Invalid username or password");
                     return;
                 }
@@ -87,7 +90,8 @@ public class UserLogin {
                     RateLimit.resetFailedAttempts(username); // Reset failed attempts on success
 
                     User user = new User(username, storedPassword, role, firstname, lastname, phoneNumber, email);
-                    System.out.println("Login successful! Welcome " + user.getFirstName() + " (" + user.getRole() + ")");
+                    Session.setCurrentUser(user);  // Store globally
+                    Logging.log(username, "Login Successful");
 
                     if (user.getRole().equals("Admin")) {
                         AdminDashboard adminDashboard = new AdminDashboard(stage);
@@ -97,16 +101,17 @@ public class UserLogin {
                         ReceptionistDashboard receptionistDashboard = new ReceptionistDashboard(stage);
                         receptionistDashboard.showReceptionistDashboardScene();
                     }
-
-                    // TODO: Implement role-based redirection for Manager
                     if (user.getRole().equals("Manager")) {
-                        System.out.println("Move to Manager dashboard");
+                        ManagerDashboard managerDashboard = new ManagerDashboard(stage);
+                        managerDashboard.showManagerDashboardScene();
                     }
                 } else {
+                    Logging.log(username, "Login Attempt - Failed (Incorrect Password)");
                     showAlert("Authentication Failed", "Invalid username or password.");
                     RateLimit.increaseFailedAttempts(username);
                 }
             } else {
+                Logging.log(username, "Login Attempt - Failed (User Not Found)");
                 showAlert("Authentication Failed", "Invalid username or password.");
             }
 

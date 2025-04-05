@@ -92,8 +92,10 @@ public class AdminDashboard {
         // Sign Out button
         Button signOutButton = new Button("Sign Out");
         signOutButton.setOnAction(e -> {
+            Logging.log(Session.getCurrentUser().getUsername(), "Signed out");
             UserLogin userLogin = new UserLogin(stage);
             userLogin.initializeComponents();
+            Session.clearSession();
         });
 
         Button unlockUserAccountButton = new Button("Unlock User Account");
@@ -104,6 +106,7 @@ public class AdminDashboard {
             dialog.setContentText("Enter username to unlock account:");
 
             dialog.showAndWait().ifPresent(username -> {
+                Logging.log(Session.getCurrentUser().getUsername(), "Unlocked user account: " + username);
                 RateLimit.unlockAccount(username);
                 showAlert("Success", "User " + username + " has been unlocked.");
             });
@@ -125,6 +128,7 @@ public class AdminDashboard {
     private void registerUser(String firstname, String lastname, String username, String password, String role, String email, String phoneNumber) {
         Connection con = DBUtils.establishConnection();
         String insertQuery = "INSERT INTO users (firstname, lastname, username, password, role, email, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String adminUsername = Session.getCurrentUser().getUsername();
 
         try {
 
@@ -139,13 +143,16 @@ public class AdminDashboard {
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
+                Logging.log(adminUsername, "Registered new user: " + username + " (Role: " + role + ")");
                 showAlert("Success", "User registered successfully!");
             } else {
+                Logging.log(adminUsername, "Failed to register user: " + username);
                 showAlert("Registration Failed", "Could not register user.");
             }
 
             DBUtils.closeConnection(con, statement);
         } catch (Exception e) {
+            Logging.log(adminUsername, "Database error while registering user: " + username);
             e.printStackTrace();
             showAlert("Database Error", "Could not register user.");
         }
