@@ -45,10 +45,25 @@ public class ReceptionistDashboard {
         Button createReservationButton = new Button("Create Reservation");
         createReservationButton.setOnAction(event -> openCreateReservation());
 
+        Button showReservationsButton = new Button("Show Reservations");
+        showReservationsButton.setOnAction(event -> {
+            DisplayReservations display = new DisplayReservations();
+            display.showAllReservations();
+        });
+
+        Button signOutButton = new Button("Sign Out");
+        signOutButton.setOnAction(event -> returnToLogin());
+
         roomTableView = new TableView<>();
         setupTableView();
 
-        layout.getChildren().addAll(dashboardTitle, checkRoomsButton, createCustomerButton, showCustomersButton, createReservationButton, roomTableView);
+        layout.getChildren().addAll(dashboardTitle, checkRoomsButton, createCustomerButton, showCustomersButton, createReservationButton, showReservationsButton,
+                signOutButton, roomTableView);
+    }
+
+    private void returnToLogin() {
+        UserLogin userLogin = new UserLogin(stage);
+        userLogin.initializeComponents();
     }
 
     // Opens the Customer Registration Form
