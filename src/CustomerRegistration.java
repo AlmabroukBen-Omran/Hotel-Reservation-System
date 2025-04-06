@@ -60,26 +60,31 @@ public class CustomerRegistration {
 
         if (firstname.isEmpty() || lastname.isEmpty() || phoneNumber.isEmpty() || qid.isEmpty()) {
             showAlert("Registration Failed", "Please fill in all fields.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Customer registration failed: One or more fields were empty.");
             return;
         }
 
         if (!ValidateCustomerRegistration.isValidFirstName(firstname)) {
             showAlert("Invalid First Name", "First name must contain only letters and be 2 to 50 characters long.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Invalid first name entered during registration: " + firstname);
             return;
         }
 
         if (!ValidateCustomerRegistration.isValidLastName(lastname)) {
             showAlert("Invalid Last Name", "Last name must contain only letters and be 2 to 50 characters long.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Invalid last name entered during registration: " + lastname);
             return;
         }
 
         if (!ValidateCustomerRegistration.isValidPhoneNumber(phoneNumber)) {
             showAlert("Invalid Phone Number", "Phone number must conform to the Qatari format (e.g., +974 XXXXXXXX)");
+            Logging.log(Session.getCurrentUser().getUsername(), "Invalid phone number entered during registration: " + phoneNumber);
             return;
         }
 
         if (!ValidateCustomerRegistration.isValidQid(qid)) {
             showAlert("Invalid QID", "QID must only consist of 11 digits.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Invalid QID entered during registration: " + qid);
             return;
         }
 
@@ -96,13 +101,16 @@ public class CustomerRegistration {
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {
                 showAlert("Success", "Customer registered successfully!");
+                Logging.log(Session.getCurrentUser().getUsername(), "Successfully registered customer: " + firstname + " " + lastname);
                 stage.close(); // Close registration window after success
             } else {
                 showAlert("Failure", "Customer registration failed.");
+                Logging.log(Session.getCurrentUser().getUsername(), "Customer registration failed: No rows affected.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Database Error", "Error while inserting customer.");
+            Logging.log(Session.getCurrentUser().getUsername(), "SQL Exception during customer registration: " + e.getMessage());
         }
     }
 

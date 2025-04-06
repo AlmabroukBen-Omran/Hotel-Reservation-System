@@ -10,6 +10,8 @@ import java.sql.*;
 public class DisplayReservations {
 
     public void showAllReservations() {
+        String username = Session.getCurrentUser().getUsername();
+
         Stage stage = new Stage();
         stage.setTitle("All Reservations");
 
@@ -46,8 +48,10 @@ public class DisplayReservations {
             {
                 cancelBtn.setOnAction(e -> {
                     Reservation reservation = getTableView().getItems().get(getIndex());
-                    DeleteReservation.delete(reservation.getReservationID().get());
+                    int resID = reservation.getReservationID().get();
+                    DeleteReservation.delete(resID);
                     getTableView().getItems().remove(reservation);
+                    Logging.log(username, "Reservation ID: " + resID + " removed from view.");
                 });
             }
 
@@ -58,7 +62,10 @@ public class DisplayReservations {
             }
         });
 
-        reservationTable.getColumns().addAll(idCol, customerIdCol, roomNumberCol, checkInCol, checkOutCol, depositCol, paymentCol, createdByCol, cancelCol);
+        reservationTable.getColumns().addAll(
+                idCol, customerIdCol, roomNumberCol, checkInCol, checkOutCol,
+                depositCol, paymentCol, createdByCol, cancelCol
+        );
 
         ObservableList<Reservation> reservations = FXCollections.observableArrayList();
         String query = "SELECT * FROM reservations";
@@ -81,10 +88,12 @@ public class DisplayReservations {
             }
 
             reservationTable.setItems(reservations);
+            Logging.log(username, "Successfully loaded " + reservations.size() + " reservations from database.");
 
         } catch (SQLException e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Error fetching reservations").showAndWait();
+            Logging.log(username, "Failed to load reservations: " + e.getMessage());
         }
 
         VBox layout = new VBox(10, reservationTable);

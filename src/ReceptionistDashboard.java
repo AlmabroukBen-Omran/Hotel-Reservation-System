@@ -34,25 +34,41 @@ public class ReceptionistDashboard {
         dashboardTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         Button checkRoomsButton = new Button("Check Room Availability");
-        checkRoomsButton.setOnAction(event -> checkRoomAvailability());
+        checkRoomsButton.setOnAction(event -> {
+            checkRoomAvailability();
+            Logging.log(Session.getCurrentUser().getUsername(), "Checked room availability.");
+        });
 
         Button createCustomerButton = new Button("Create Customer Profile");
-        createCustomerButton.setOnAction(event -> openCustomerRegistration());
+        createCustomerButton.setOnAction(event -> {
+            openCustomerRegistration();
+            Logging.log(Session.getCurrentUser().getUsername(), "Opened customer registration form.");
+        });
 
         Button showCustomersButton = new Button("Show Customers");
-        showCustomersButton.setOnAction(event -> showCustomers());
+        showCustomersButton.setOnAction(event -> {
+            showCustomers();
+            Logging.log(Session.getCurrentUser().getUsername(), "Viewed all customer profiles.");
+        });
 
         Button createReservationButton = new Button("Create Reservation");
-        createReservationButton.setOnAction(event -> openCreateReservation());
+        createReservationButton.setOnAction(event -> {
+            openCreateReservation();
+            Logging.log(Session.getCurrentUser().getUsername(), "Opened reservation creation form.");
+        });
 
         Button showReservationsButton = new Button("Show Reservations");
         showReservationsButton.setOnAction(event -> {
             DisplayReservations display = new DisplayReservations();
             display.showAllReservations();
+            Logging.log(Session.getCurrentUser().getUsername(), "Viewed all reservations.");
         });
 
         Button signOutButton = new Button("Sign Out");
-        signOutButton.setOnAction(event -> returnToLogin());
+        signOutButton.setOnAction(event -> {
+            returnToLogin();
+            Logging.log(Session.getCurrentUser().getUsername(), "Signed out.");
+        });
 
         roomTableView = new TableView<>();
         setupTableView();

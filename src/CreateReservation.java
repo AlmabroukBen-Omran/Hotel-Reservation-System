@@ -89,6 +89,7 @@ public class CreateReservation {
                 createdByField.getText().trim().isEmpty()) {
 
             showAlert("Reservation Failed", "All fields must be filled before proceeding.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Attempted to create reservation, but some fields were empty.");
             return;
         }
 
@@ -100,22 +101,25 @@ public class CreateReservation {
             deposit = Float.parseFloat(depositField.getText().trim());
         } catch (NumberFormatException e) {
             showAlert("Input Error", "Customer ID, Room Number, and Deposit must be valid numbers.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Failed to parse customer ID, room number, or deposit amount.");
             return;
         }
 
-        // TODO: Add regex validation for reservation fields
         if (!ValidateReservation.isValidCustomerID(customerID)) {
             showAlert("Invalid Customer ID", "Customer ID must contain between 1 and 3 digits.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Validation failed: Invalid Customer ID format.");
             return;
         }
 
         if (!ValidateReservation.isValidRoomNumber(roomNumber)) {
             showAlert("Invalid Room Number", "Room number must contain 3 digits only.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Validation failed: Invalid Room Number format.");
             return;
         }
 
         if (!ValidateReservation.isValidDeposit(deposit)) {
             showAlert("Invalid Deposit", "Deposit must be a positive decimal amount with 1 or 2 decimal places.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Validation failed: Invalid Deposit format.");
             return;
         }
 
@@ -123,6 +127,7 @@ public class CreateReservation {
 
         if (!ValidateReservation.isValidCreatedBy(createdBy)) {
             showAlert("Invalid Username", "Username must be 3-20 characters long and contain only letters, numbers, and underscores.");
+            Logging.log(Session.getCurrentUser().getUsername(), "Validation failed: Invalid username format for Created By.");
             return;
         }
 
@@ -130,12 +135,14 @@ public class CreateReservation {
             // Step 2: Validate if "createdBy" exists in the users table and is a Receptionist
             if (!usernameExists(con, createdBy)) {
                 showAlert("Invalid User", "The 'Created By' field must contain a valid Receptionist's username.");
+                Logging.log(Session.getCurrentUser().getUsername(), "'Created By' user not found or not a receptionist.");
                 return;
             }
 
             // Step 3: Validate if Customer ID exists in the customers table
             if (!customerExists(con, customerID)) {
                 showAlert("Invalid Customer", "Customer ID does not exist in the system.");
+                Logging.log(Session.getCurrentUser().getUsername(), "Attempted reservation for non-existent customer ID: " + customerID);
                 return;
             }
 
@@ -154,10 +161,12 @@ public class CreateReservation {
 
                     if (isReserved) {
                         showAlert("Room Unavailable", "This room is already reserved.");
+                        Logging.log(Session.getCurrentUser().getUsername(), "Attempted reservation for already reserved room: " + roomNumber);
                         return;
                     }
                 } else {
                     showAlert("Room Not Found", "Room number does not exist.");
+                    Logging.log(Session.getCurrentUser().getUsername(), "Attempted reservation for non-existent room number: " + roomNumber);
                     return;
                 }
             }
@@ -170,6 +179,7 @@ public class CreateReservation {
                 paymentRequired = 1500;
             } else {
                 showAlert("Room Type Error", "Unknown room type: " + roomType);
+                Logging.log(Session.getCurrentUser().getUsername(), "Unknown room type encountered: " + roomType);
                 return;
             }
 
@@ -195,15 +205,18 @@ public class CreateReservation {
                     }
 
                     showAlert("Success", "Reservation created and room marked as reserved.");
+                    Logging.log(Session.getCurrentUser().getUsername(), "Successfully created reservation for customer ID: " + customerID + ", Room: " + roomNumber);
                     stage.close();
                 } else {
                     showAlert("Failure", "Failed to create reservation.");
+                    Logging.log(Session.getCurrentUser().getUsername(), "Failed to create reservation. Database insert returned 0 rows.");
                 }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Database Error", "Something went wrong: " + e.getMessage());
+            Logging.log(Session.getCurrentUser().getUsername(), "SQLException during reservation creation: " + e.getMessage());
         }
     }
 

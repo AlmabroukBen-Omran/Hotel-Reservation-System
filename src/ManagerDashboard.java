@@ -31,10 +31,16 @@ public class ManagerDashboard {
         dashboardTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         Button viewMaintenanceReports = new Button("View Maintenance Reports");
-        viewMaintenanceReports.setOnAction(e -> loadReportsByType("Maintenance"));
+        viewMaintenanceReports.setOnAction(e -> {
+            Logging.log("Manager", "Viewing Maintenance Reports.");
+            loadReportsByType("Maintenance");
+        });
 
         Button viewFeedbackReports = new Button("View Feedback Reports");
-        viewFeedbackReports.setOnAction(e -> loadReportsByType("Feedback"));
+        viewFeedbackReports.setOnAction(e -> {
+            Logging.log("Manager", "Viewing Feedback Reports.");
+            loadReportsByType("Feedback");
+        });
 
         layout.getChildren().addAll(dashboardTitle, viewMaintenanceReports, viewFeedbackReports);
     }
@@ -66,17 +72,14 @@ public class ManagerDashboard {
                     Report report = getTableView().getItems().get(getIndex());
                     deleteReport(report.getReportID());
                     getTableView().getItems().remove(report);
+                    Logging.log("Manager", "Deleted report with ID: " + report.getReportID());
                 });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(deleteBtn);
-                }
+                setGraphic(empty ? null : deleteBtn);
             }
         });
 
@@ -102,8 +105,11 @@ public class ManagerDashboard {
             }
 
             reportTable.setItems(reportList);
+            Logging.log("Manager", "Loaded " + reportList.size() + " " + type + " report(s).");
+
         } catch (SQLException e) {
             e.printStackTrace();
+            Logging.log("Manager", "Failed to load " + type + " reports: " + e.getMessage());
             showAlert("Database Error", "Unable to load reports.");
         }
 
@@ -119,6 +125,7 @@ public class ManagerDashboard {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            Logging.log("Manager", "Failed to delete report with ID " + reportID + ": " + e.getMessage());
             showAlert("Database Error", "Unable to delete report.");
         }
     }
