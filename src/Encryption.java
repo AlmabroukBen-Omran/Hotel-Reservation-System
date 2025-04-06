@@ -8,7 +8,6 @@ public class Encryption {
     private static final String ALGORITHM = "AES";
 
     public static String encrypt(String plainText) {
-        String preview = plainText.length() > 5 ? plainText.substring(0, 5) + "..." : plainText;
         try {
             String secretKey = System.getenv("AES_KEY");
             if (secretKey == null || secretKey.length() != 16) {
@@ -34,7 +33,6 @@ public class Encryption {
     }
 
     public static String decrypt(String encryptedText) {
-        String preview = encryptedText.length() > 10 ? encryptedText.substring(0, 10) + "..." : encryptedText;
         try {
             String secretKey = System.getenv("AES_KEY");
             if (secretKey == null || secretKey.length() != 16) {

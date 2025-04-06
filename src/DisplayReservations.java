@@ -49,6 +49,7 @@ public class DisplayReservations {
                 cancelBtn.setOnAction(e -> {
                     Reservation reservation = getTableView().getItems().get(getIndex());
                     int resID = reservation.getReservationID().get();
+                    DeleteReservation.updateRoomStatus(resID);
                     DeleteReservation.delete(resID);
                     getTableView().getItems().remove(reservation);
                     Logging.log(username, "Reservation ID: " + resID + " removed from view.");

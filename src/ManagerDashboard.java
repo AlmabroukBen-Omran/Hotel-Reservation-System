@@ -23,6 +23,11 @@ public class ManagerDashboard {
         stage.show();
     }
 
+    private void returnToLogin() {
+        UserLogin userLogin = new UserLogin(stage);
+        userLogin.initializeComponents();
+    }
+
     private void initializeComponents() {
         layout = new VBox(10);
         layout.setPadding(new Insets(10));
@@ -42,7 +47,14 @@ public class ManagerDashboard {
             loadReportsByType("Feedback");
         });
 
-        layout.getChildren().addAll(dashboardTitle, viewMaintenanceReports, viewFeedbackReports);
+        Button signOutButton = new Button("Sign Out");
+        signOutButton.setOnAction(event -> {
+            returnToLogin();
+            Logging.log(Session.getCurrentUser().getUsername(), "Signed out.");
+            Session.clearSession();
+        });
+
+        layout.getChildren().addAll(dashboardTitle, viewMaintenanceReports, viewFeedbackReports, signOutButton);
     }
 
     private void loadReportsByType(String type) {

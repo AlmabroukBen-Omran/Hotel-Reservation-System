@@ -112,14 +112,18 @@ public class AdminDashboard {
             });
         });
 
+        Button viewLogsButton = new Button("View Logs");
+        viewLogsButton.setOnAction(e -> {
+            ViewLogs.displayLogs(); // Opens the logs window in a new stage
+        });
 
         layout.getChildren().addAll(
                 titleLabel, firstnameField, lastnameField, usernameField,
                 passwordField, roleBox, emailField, phoneNumberField, registerButton, signOutButton,
-                unlockUserAccountButton
+                unlockUserAccountButton, viewLogsButton
         );
 
-        Scene adminDashboardScene = new Scene(layout, 400, 400);
+        Scene adminDashboardScene = new Scene(layout, 450, 450);
         stage.setTitle("Admin Dashboard");
         stage.setScene(adminDashboardScene);
         stage.show();

@@ -68,6 +68,7 @@ public class ReceptionistDashboard {
         signOutButton.setOnAction(event -> {
             returnToLogin();
             Logging.log(Session.getCurrentUser().getUsername(), "Signed out.");
+            Session.clearSession();
         });
 
         roomTableView = new TableView<>();
