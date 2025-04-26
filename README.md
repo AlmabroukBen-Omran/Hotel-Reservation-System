@@ -143,7 +143,7 @@ Collaborative efforts were made across the project, including design diagrams, t
 
 ## 📜 License
 
-This project was developed as part of the **Secure Software Development (DACS 3203-5)** course at Qatar University and is for educational purposes only.
+This project was developed as part of the **Secure Software Development (DACS 3203-5)** course at the University of Doha for Science and Technology and is for educational purposes only.
 
 ---
 
